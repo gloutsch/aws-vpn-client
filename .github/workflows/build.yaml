@@ -1,0 +1,62 @@
+---
+name: build
+on: push
+jobs:
+  build:
+    # https://github.com/OpenVPN/openvpn/blob/master/.github/workflows/build.yaml#L132
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install build dependencies
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: >
+          sudo apt-get update && sudo apt-get install -y
+          liblzo2-dev libpam0g-dev liblz4-dev linux-libc-dev man2html
+          libcmocka-dev python3-docutils libtool automake autoconf golang
+
+      - name: Checkout OpenVPN
+        uses: actions/checkout@v2
+        with:
+          repository: OpenVPN/openvpn
+          ref: v2.5.1
+          path: openvpn
+
+      - name: Checkout aws-vpn-client
+        uses: actions/checkout@v2
+        with:
+          path: aws-vpn-client
+
+      - name: Patch OpenVPN
+        run: git -C openvpn apply ../aws-vpn-client/openvpn-v2.5.1-aws.patch
+
+      - name: autoconf
+        run: autoreconf -fvi
+        working-directory: openvpn
+
+      - name: configure build
+        run: ./configure
+        working-directory: openvpn
+
+      - name: build OpenVPN
+        run: make -j 2
+        working-directory: openvpn
+
+      - name: build SAMLserver
+        run: go build -o SAMLserver server.go
+        working-directory: aws-vpn-client
+
+      - name: release
+        run: >
+          mkdir release &&
+          cp
+          aws-vpn-client/SAMLserver
+          aws-vpn-client/vpn.conf
+          aws-vpn-client/aws-connect.sh
+          openvpn/src/openvpn/openvpn
+          release
+
+      - name: upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: aws-vpn-client
+          path: release
