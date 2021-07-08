@@ -18,7 +18,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: OpenVPN/openvpn
-          ref: v2.5.1
+          ref: v2.5.3
           path: openvpn
 
       - name: Checkout aws-vpn-client
@@ -27,7 +27,7 @@ jobs:
           path: aws-vpn-client
 
       - name: Patch OpenVPN
-        run: git -C openvpn apply ../aws-vpn-client/openvpn-v2.5.1-aws.patch
+        run: git -C openvpn apply ../aws-vpn-client/openvpn-v2.5.3-aws.patch
 
       - name: autoconf
         run: autoreconf -fvi
@@ -51,9 +51,16 @@ jobs:
           cp
           aws-vpn-client/SAMLserver
           aws-vpn-client/vpn.conf
+          aws-vpn-client/domains.txt
           aws-vpn-client/aws-connect.sh
+          aws-vpn-client/resolvconf.sh
           openvpn/src/openvpn/openvpn
-          release
+          release &&
+          chmod +x
+          release/SAMLserver
+          release/aws-connect.sh
+          release/openvpn
+          release/resolvconf.sh
 
       - name: upload artifacts
         uses: actions/upload-artifact@v2
