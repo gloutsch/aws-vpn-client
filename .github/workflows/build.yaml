@@ -12,7 +12,7 @@ jobs:
         run: >
           sudo apt-get update && sudo apt-get install -y
           liblzo2-dev libpam0g-dev liblz4-dev libnl-genl-3-dev linux-libc-dev man2html
-          libcmocka-dev python3-docutils libtool automake autoconf golang
+          libcmocka-dev libcap-ng-dev python3-docutils libtool automake autoconf golang
 
       - name: Checkout OpenVPN
         uses: actions/checkout@v2
