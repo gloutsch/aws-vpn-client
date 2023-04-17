@@ -27,7 +27,7 @@ jobs:
           path: aws-vpn-client
 
       - name: Patch OpenVPN
-        run: git -C openvpn apply ../aws-vpn-client/openvpn-v2.6.1-aws.patch
+        run: git -C openvpn apply ../aws-vpn-client/openvpn-v2.6.3-aws.patch
 
       - name: autoconf
         run: autoreconf -fvi
