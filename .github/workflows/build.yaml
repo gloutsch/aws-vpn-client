@@ -11,14 +11,14 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: >
           sudo apt-get update && sudo apt-get install -y
-          liblzo2-dev libpam0g-dev liblz4-dev linux-libc-dev man2html
+          liblzo2-dev libpam0g-dev liblz4-dev libnl-genl-3-dev linux-libc-dev man2html
           libcmocka-dev python3-docutils libtool automake autoconf golang
 
       - name: Checkout OpenVPN
         uses: actions/checkout@v2
         with:
           repository: OpenVPN/openvpn
-          ref: v2.6.1
+          ref: v2.6.3
           path: openvpn
 
       - name: Checkout aws-vpn-client
