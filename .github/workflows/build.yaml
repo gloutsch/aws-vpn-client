@@ -18,7 +18,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: OpenVPN/openvpn
-          ref: v2.6.6
+          ref: v2.6.8
           path: openvpn
 
       - name: Checkout aws-vpn-client
@@ -27,7 +27,7 @@ jobs:
           path: aws-vpn-client
 
       - name: Patch OpenVPN
-        run: git -C openvpn apply ../aws-vpn-client/openvpn-v2.6.6-aws.patch
+        run: git -C openvpn apply ../aws-vpn-client/openvpn-v2.6.8-aws.patch
 
       - name: autoconf
         run: autoreconf -fvi
