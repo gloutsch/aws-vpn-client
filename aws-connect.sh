@@ -88,7 +88,7 @@ echo "Running OpenVPN with sudo. Enter password if requested"
 # Finally OpenVPN with a SAML response we got
 # Delete saml-response.txt after connect
 sudo bash -c "$OVPN_BIN --config "${OVPN_CONF}" \
-    --verb 3 --auth-nocache --inactive 3600 \
+    --verb 4 --auth-nocache --inactive 3600 \
     --proto "$PROTO" --remote $SRV $PORT --ca "$OVPN_CA" \
     --script-security 2 \
     --route-up '/usr/bin/env rm saml-response.txt' \
