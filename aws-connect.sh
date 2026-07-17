@@ -78,7 +78,7 @@ wait_file "saml-response.txt" 60 || {
   exit 1
 }
 
-pkill SAMLserver
+pkill SAMLserver || :
 
 # get SID from the reply
 VPN_SID=$(echo "$OVPN_OUT" | awk -F : '{print $7}')
