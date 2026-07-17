@@ -99,7 +99,7 @@ case "${unameOut}" in
     *)          echo "Could not determine 'open' command for this OS"; exit 1;;
 esac
 
-wait_file "saml-response.txt" 60 || {
+wait_file "saml-response.txt" 120 || {
   echo "SAML Authentication time out"
   exit 1
 }
