@@ -47,8 +47,16 @@ fi
 wait_file() {
   local file="$1"; shift
   local wait_seconds="${1:-10}"; shift # 10 seconds as default timeout
-  until test $((wait_seconds--)) -eq 0 -o -f "$file" ; do sleep 1; done
-  ((++wait_seconds))
+  # We use a loop with short sleeps so that we remain responsive to interrupts.
+  # The trap will clean up background processes if interrupted.
+  while [[ $wait_seconds -gt 0 ]]; do
+    if [[ -f "$file" ]]; then
+      return 0
+    fi
+    sleep 1
+    ((wait_seconds--))
+  done
+  return 1
 }
 
 # resolv manually hostname to IP, as we have to keep persistent ip address
