@@ -15,14 +15,14 @@ jobs:
           libcmocka-dev libcap-ng-dev python3-docutils libtool automake autoconf golang
 
       - name: Checkout OpenVPN
-        uses: actions/checkout@v2
+        uses: actions/checkout@v7
         with:
           repository: OpenVPN/openvpn
           ref: v2.7.5
           path: openvpn
 
       - name: Checkout aws-vpn-client
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           path: aws-vpn-client
 
@@ -63,7 +63,7 @@ jobs:
           release/resolvconf.sh
 
       - name: upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: aws-vpn-client
           path: release
