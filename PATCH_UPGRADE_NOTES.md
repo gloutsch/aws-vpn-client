@@ -13,7 +13,7 @@ The AWS patch is intended to preserve these behaviours:
 
 ## Upgrading from v2.6.13 to v2.7.5
 
-During the upgrade to v2.7.5, the following upstream changes required adaptations in `openvpn-v2.7.5-aws.patch`:
+During the upgrade to v2.7.5, the following upstream changes required adaptations in the v2.7.5 patch (`openvpn-v2.7.5-aws.patch`, since replaced by `openvpn-v2.7.8-aws.patch`; see git history):
 
 1. **`manage.c` (Type Changes):**
    Upstream updated the socket `len` variable from `int` to `ssize_t` to be more compliant with standard network APIs. The patch context had to be updated to match the new `ssize_t len = 0;` line.
@@ -26,7 +26,7 @@ During the upgrade to v2.7.5, the following upstream changes required adaptation
 
 ## Upgrading from v2.7.5 to v2.7.8
 
-`openvpn-v2.7.8-aws.patch` was generated from `openvpn-v2.7.5-aws.patch`. The old patch applied to v2.7.8 with line offsets only (`ssl.c` hunks shifted by 55 lines, `options.h` needed fuzz 2) and no failed hunks, so no semantic change to the patch was needed. Upstream `ssl.c` changed a lot between the two tags (+206/-84), so the patched `write_string` and key-method code were re-read after applying:
+`openvpn-v2.7.8-aws.patch` replaces `openvpn-v2.7.5-aws.patch`, which was removed from the repository. The old patch applied to v2.7.8 with line offsets only (`ssl.c` hunks shifted by 55 lines, `options.h` needed fuzz 2) and no failed hunks, so no semantic change to the patch was needed. Upstream `ssl.c` changed a lot between the two tags (+206/-84), so the patched `write_string` and key-method code were re-read after applying:
 
 - `write_string` still clamps to `UINT32_MAX` and writes the length with `buf_write_u32()`.
 - The key-method buffer still gets `BLEN(buf)` in its first 4 octets.
