@@ -24,11 +24,28 @@ During the upgrade to v2.7.5, the following upstream changes required adaptation
 3. **`ssl.c` (Key Method Length Prefix):**
    The existing AWS behaviour that writes `BLEN(buf)` into the first 4 octets of the key-method buffer is still required and was retained.
 
+## Upgrading from v2.7.5 to v2.7.8
+
+`openvpn-v2.7.8-aws.patch` was generated from `openvpn-v2.7.5-aws.patch`. The old patch applied to v2.7.8 with line offsets only (`ssl.c` hunks shifted by 55 lines, `options.h` needed fuzz 2) and no failed hunks, so no semantic change to the patch was needed. Upstream `ssl.c` changed a lot between the two tags (+206/-84), so the patched `write_string` and key-method code were re-read after applying:
+
+- `write_string` still clamps to `UINT32_MAX` and writes the length with `buf_write_u32()`.
+- The key-method buffer still gets `BLEN(buf)` in its first 4 octets.
+
+Upstream also changed `buffer.h` (null-safe `buf_defined()` and `buf_valid()`); this does not touch the patched `BUF_SIZE_MAX` line.
+
+Verification done:
+
+1. `patch -p1 --dry-run` against a fresh v2.7.8 tarball is clean.
+2. Default `./configure`, then `make` in `src/compat` and `src/openvpn`, builds with `[DCO]` (`-Wshift-negative-value` warnings from the unparenthesized `BUF_SIZE_MAX` macro remain).
+3. The unauthenticated first step of `aws-connect.sh` returns the `AUTH_FAILED,CRV1` challenge with the SAML URL, with both the 2.7.5 and 2.7.8 binaries.
+
+A full authenticated connection with 2.7.8 is the remaining check after the first real reconnect.
+
 ## DCO (Data Channel Offload)
 
 DCO builds failed with v2.6.13 on this machine because recent Linux kernel headers define OpenVPN DCO interface values that collided with v2.6.13's bundled DCO compatibility definitions.
 
-OpenVPN v2.7.5 built successfully with DCO enabled in this environment. Do not pass `--disable-dco` unless there is a concrete build or runtime issue. Verify DCO support after building with:
+OpenVPN v2.7.5 and v2.7.8 built successfully with DCO enabled in this environment. Do not pass `--disable-dco` unless there is a concrete build or runtime issue. Verify DCO support after building with:
 
 ```bash
 ./openvpn --version | grep DCO
