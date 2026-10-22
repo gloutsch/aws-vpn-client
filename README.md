@@ -1,31 +1,33 @@
-# Project status
-> :warning: **Project is migrated** to the [aws-vpn-client/aws-vpn-client](https://github.com/aws-vpn-client/aws-vpn-client). This repository will not be updated!
- 
 # aws-vpn-client
 
-This is PoC to connect to the AWS Client VPN with OSS OpenVPN using SAML
-authentication. Tested on macOS and Linux, should also work on other POSIX OS with a minor changes.
-
-See [my blog post](https://smallhacks.wordpress.com/2020/07/08/aws-client-vpn-internals/) for the implementation details.
-
-P.S. Recently [AWS released Linux desktop client](https://aws.amazon.com/about-aws/whats-new/2021/06/aws-client-vpn-launches-desktop-client-for-linux/), however, it is currently available only for Ubuntu, using Mono and is closed source. 
+Connect to the AWS Client VPN with OSS OpenVPN using SAML authentication.
+The DNS hook needs Linux with systemd-resolved. Based on
+[samm-git/aws-vpn-client](https://github.com/samm-git/aws-vpn-client); see
+[the blog post](https://smallhacks.wordpress.com/2020/07/08/aws-client-vpn-internals/)
+for the implementation details.
 
 ## Content of the repository
 
-- [openvpn-v2.4.9-aws.patch](openvpn-v2.4.9-aws.patch) - patch required to build
-AWS compatible OpenVPN v2.4.9, based on the
-[AWS source code](https://amazon-source-code-downloads.s3.amazonaws.com/aws/clientvpn/osx-v1.2.5/openvpn-2.4.5-aws-2.tar.gz) (thanks to @heprotecbuthealsoattac) for the link.
-- [server.go](server.go) - Go server to listed on http://127.0.0.1:35001 and save
-SAML Post data to the file
-- [aws-connect.sh](aws-connect.sh) - bash wrapper to run OpenVPN. It runs OpenVPN first time to get SAML Redirect and open browser and second time with actual SAML response
+- `openvpn-vX.Y.Z-aws.patch` - patch required to build an AWS compatible
+OpenVPN vX.Y.Z. Current: [openvpn-v2.7.8-aws.patch](openvpn-v2.7.8-aws.patch).
+Older versions are at the matching `openvpn-vX.Y.Z` tags.
+[PATCH_UPGRADE_NOTES.md](PATCH_UPGRADE_NOTES.md) describes how to port it to a new OpenVPN version.
+- [server.go](server.go) - Go server listening on http://127.0.0.1:35001 that saves the SAML POST data to `saml-response.txt`
+- [aws-connect.sh](aws-connect.sh) - bash wrapper to run OpenVPN. It runs OpenVPN first to get the SAML redirect, opens the browser, then runs OpenVPN again with the actual SAML response
+- [resolvconf.sh](resolvconf.sh) - OpenVPN `up`/`down` hook. It registers the pushed DNS servers with `resolvconf`, adds the routing domains from [domains.txt](domains.txt) and disables DNSSEC and DNS over TLS on the tunnel link
+- [vpn.conf](vpn.conf) - sample OpenVPN configuration
+- [build.yaml](.github/workflows/build.yaml) - CI build of the patched OpenVPN and `SAMLserver`
+- [latest-openvpn-version.sh](latest-openvpn-version.sh) - prints the latest stable OpenVPN release
+- `openvpn-v2.6.12-aws.patch`, `openssl-v3.0.14-aws-000-revert-self-signed-cert-logic.patch` - AWS patches for reference, not used by the build
+- [openvpn-aws.rb](openvpn-aws.rb) - unmaintained Homebrew formula for OpenVPN 2.5.1
 
 ## How to use
 
-1. Build patched openvpn version and put it to the folder with a script
-1. Start HTTP server with `go run server.go`
-1. Set VPN_HOST in the [aws-connect.sh](aws-connect.sh)
-1. Replace CA section in the sample [vpn.conf](vpn.conf) with one from your AWS configuration
-1. Finally run `aws-connect.sh` to connect to the AWS.
+1. Get the binaries: download the `aws-vpn-client` artifact of a tagged build, or apply the patch to the matching OpenVPN release, build it and run `go build -o SAMLserver server.go`
+1. Put `openvpn`, `SAMLserver`, `aws-connect.sh`, `resolvconf.sh`, `vpn.conf`, `domains.txt` and your CA file in one directory; the scripts use relative paths
+1. Run `./aws-connect.sh --host <vpn-host> --ca <ca.pem>`. Optional: `--port` (default 1194), `--timeout` (seconds to wait for the SAML response, default 300), `--config`, `--bin`
+
+Requires `sudo`, a browser opener (`xdg-open`), and `resolvconf` and `resolvectl` for the DNS hook.
 
 ### Additional Steps
 
@@ -34,6 +36,17 @@ Inspect your ovpn config and remove the following lines if present
 - `auth-federate` (propietary AWS keyword)
 - `auth-retry interact` (do not retry on failures)
 - `remote` and `remote-random-hostname` (already handled in CLI and can cause conflicts with it)
+
+## Releasing
+
+A release is a tag `openvpn-vX.Y.Z` on a commit that contains
+`openvpn-vX.Y.Z-aws.patch`. Pushing the tag runs the build, which applies the
+patch to OpenVPN vX.Y.Z and uploads OpenVPN and `SAMLserver` with the scripts as
+the `aws-vpn-client` artifact. The build can also be started by hand with
+`gh workflow run build.yaml -f openvpn_version=vX.Y.Z`.
+
+`./latest-openvpn-version.sh [series]` prints the latest stable OpenVPN release
+(for example `2.6` for that series) and tells whether its patch exists.
 
 ## Todo
 
