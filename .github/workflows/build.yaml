@@ -1,6 +1,15 @@
 ---
 name: build
-on: push
+on:
+  push:
+    tags:
+      - 'openvpn-v*.*.*'
+  workflow_dispatch:
+    inputs:
+      openvpn_version:
+        description: 'OpenVPN version to build, e.g. v2.7.8 (needs openvpn-<version>-aws.patch)'
+        required: true
+        type: string
 jobs:
   build:
     # https://github.com/OpenVPN/openvpn/blob/master/.github/workflows/build.yaml#L132
@@ -14,11 +23,23 @@ jobs:
           liblzo2-dev libpam0g-dev liblz4-dev libnl-genl-3-dev linux-libc-dev man2html
           libcmocka-dev libcap-ng-dev python3-docutils libtool automake autoconf golang
 
+      # Manual run: the openvpn_version input. Tag push: openvpn-vX.Y.Z builds vX.Y.Z.
+      - name: Set OpenVPN version
+        env:
+          VERSION: ${{ inputs.openvpn_version || github.ref_name }}
+        run: |
+          version="${VERSION#openvpn-}"
+          if [[ ! "$version" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Invalid OpenVPN version: '$version'" >&2
+            exit 1
+          fi
+          echo "OPENVPN_VERSION=$version" >> "$GITHUB_ENV"
+
       - name: Checkout OpenVPN
         uses: actions/checkout@v7
         with:
           repository: OpenVPN/openvpn
-          ref: v2.7.8
+          ref: ${{ env.OPENVPN_VERSION }}
           path: openvpn
 
       - name: Checkout aws-vpn-client
@@ -27,7 +48,7 @@ jobs:
           path: aws-vpn-client
 
       - name: Patch OpenVPN
-        run: git -C openvpn apply ../aws-vpn-client/openvpn-v2.7.8-aws.patch
+        run: git -C openvpn apply "../aws-vpn-client/openvpn-${OPENVPN_VERSION}-aws.patch"
 
       - name: autoconf
         run: autoreconf -fvi
