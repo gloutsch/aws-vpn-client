@@ -6,6 +6,7 @@ PORT=1194
 OVPN_BIN="./openvpn"
 OVPN_CONF="vpn.conf"
 PROTO=udp
+SAML_TIMEOUT=300
 
 function usage {
   echo "usage: $0 [options] --host host --ca pemfile"
@@ -15,6 +16,7 @@ function usage {
   echo -e "\t--proto\t\topenvpn protocol"
   echo -e "\t--config\topenvpn config"
   echo -e "\t--bin\t\topenvpn binary"
+  echo -e "\t--timeout\tseconds to wait for the SAML response (default: ${SAML_TIMEOUT})"
   exit 1
 }
 
@@ -27,6 +29,7 @@ while [[ -n "$1" ]]; do
     --port) PORT="$2"; shift ;;
     --config) OVPN_CONF="$2"; shift ;;
     --bin) OVPN_BIN="$2"; shift ;;
+    --timeout) SAML_TIMEOUT="$2"; shift ;;
     --ca) OVPN_CA="$2"; shift ;;
   esac
   shift
@@ -99,7 +102,7 @@ case "${unameOut}" in
     *)          echo "Could not determine 'open' command for this OS"; exit 1;;
 esac
 
-wait_file "saml-response.txt" 120 || {
+wait_file "saml-response.txt" "$SAML_TIMEOUT" || {
   echo "SAML Authentication time out"
   exit 1
 }

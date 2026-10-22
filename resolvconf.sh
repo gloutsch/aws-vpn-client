@@ -29,6 +29,8 @@ up)
 "
    done
    echo -n "$R" | resolvconf -p -a "${dev}"
+   resolvectl dnssec "${dev}" no
+   resolvectl dnsovertls "${dev}" no
    ;;
 
 down)
