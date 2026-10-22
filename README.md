@@ -1,10 +1,11 @@
 # aws-vpn-client
 
 Connect to the AWS Client VPN with OSS OpenVPN using SAML authentication.
-The DNS hook needs Linux with systemd-resolved. Based on
-[samm-git/aws-vpn-client](https://github.com/samm-git/aws-vpn-client); see
-[the blog post](https://smallhacks.wordpress.com/2020/07/08/aws-client-vpn-internals/)
-for the implementation details.
+
+This repository is a fork of
+[aws-vpn-client/aws-vpn-client](https://github.com/aws-vpn-client/aws-vpn-client).
+See [the blog post](https://smallhacks.wordpress.com/2020/07/08/aws-client-vpn-internals/)
+for the implementation details. The DNS hook needs Linux with systemd-resolved.
 
 ## Content of the repository
 
@@ -18,7 +19,6 @@ Older versions are at the matching `openvpn-vX.Y.Z` tags.
 - [vpn.conf](vpn.conf) - sample OpenVPN configuration
 - [build.yaml](.github/workflows/build.yaml) - CI build of the patched OpenVPN and `SAMLserver`
 - [latest-openvpn-version.sh](latest-openvpn-version.sh) - prints the latest stable OpenVPN release
-- [openvpn-aws.rb](openvpn-aws.rb) - unmaintained Homebrew formula for OpenVPN 2.5.1
 
 ## How to use
 
