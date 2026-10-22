@@ -36,7 +36,7 @@ Upstream also changed `buffer.h` (null-safe `buf_defined()` and `buf_valid()`); 
 Verification done:
 
 1. `patch -p1 --dry-run` against a fresh v2.7.8 tarball is clean.
-2. Default `./configure`, then `make` in `src/compat` and `src/openvpn`, builds with `[DCO]` (`-Wshift-negative-value` warnings from the unparenthesized `BUF_SIZE_MAX` macro remain).
+2. Default `./configure`, then `make` in `src/compat` and `src/openvpn`, builds with `[DCO]` and no compiler warnings.
 3. The unauthenticated first step of `aws-connect.sh` returns the `AUTH_FAILED,CRV1` challenge with the SAML URL, with both the 2.7.5 and 2.7.8 binaries.
 
 A full authenticated connection with 2.7.8 is the remaining check after the first real reconnect.
@@ -61,4 +61,4 @@ Expected output should include `[DCO]`.
 4. Preserve the patch invariants listed above.
 5. Build with default `./configure` first so DCO remains enabled when supported.
 6. Verify the binary with `./openvpn --version`, including `[DCO]` when expected.
-7. Consider parenthesizing macro values such as `(1 << 17)` and `(1 << 18)` if touching the patch, to avoid compiler warnings from macro precedence in expressions like `USER_PASS_LEN - 1`.
+7. Keep the size macros (`BUF_SIZE_MAX`, `TLS_CHANNEL_BUF_SIZE`, `ERR_BUF_SIZE`, `USER_PASS_LEN`) parenthesized, e.g. `(1 << 17)`. Unparenthesized, expressions such as `USER_PASS_LEN - 1` or `OPTION_PARM_SIZE + 16` expand to the wrong shifts (`1 << 16`, `1 << 33`) and the compiler warns.

@@ -6,7 +6,7 @@ diff -ruN -x '*.orig' a/src/openvpn/buffer.h b/src/openvpn/buffer.h
  #include "error.h"
  
 -#define BUF_SIZE_MAX 1000000
-+#define BUF_SIZE_MAX 1 << 21
++#define BUF_SIZE_MAX (1 << 21)
  
  /*
   * Define verify_align function, otherwise
@@ -18,7 +18,7 @@ diff -ruN -x '*.orig' a/src/openvpn/common.h b/src/openvpn/common.h
   * This parameter must be >= PUSH_BUNDLE_SIZE
   */
 -#define TLS_CHANNEL_BUF_SIZE 2048
-+#define TLS_CHANNEL_BUF_SIZE 1 << 18
++#define TLS_CHANNEL_BUF_SIZE (1 << 18)
  
  /* TLS control buffer minimum size
   *
@@ -33,7 +33,7 @@ diff -ruN -x '*.orig' a/src/openvpn/error.h b/src/openvpn/error.h
 +/*
 + * Increase the error buffer size to 256 KB.
 + */
-+#define ERR_BUF_SIZE 1 << 18
++#define ERR_BUF_SIZE (1 << 18)
  #endif
  
  struct gc_arena;
@@ -82,7 +82,7 @@ diff -ruN -x '*.orig' a/src/openvpn/misc.h b/src/openvpn/misc.h
 +/*
 + * Increase the username and password length size to 128KB.
 + */
-+#define USER_PASS_LEN 1 << 17
++#define USER_PASS_LEN (1 << 17)
  #endif
      /* Note that username and password are expected to be null-terminated */
      char username[USER_PASS_LEN];
