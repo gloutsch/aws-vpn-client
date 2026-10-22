@@ -18,7 +18,6 @@ Older versions are at the matching `openvpn-vX.Y.Z` tags.
 - [vpn.conf](vpn.conf) - sample OpenVPN configuration
 - [build.yaml](.github/workflows/build.yaml) - CI build of the patched OpenVPN and `SAMLserver`
 - [latest-openvpn-version.sh](latest-openvpn-version.sh) - prints the latest stable OpenVPN release
-- `openvpn-v2.6.12-aws.patch`, `openssl-v3.0.14-aws-000-revert-self-signed-cert-logic.patch` - AWS patches for reference, not used by the build
 - [openvpn-aws.rb](openvpn-aws.rb) - unmaintained Homebrew formula for OpenVPN 2.5.1
 
 ## How to use
