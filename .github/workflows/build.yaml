@@ -10,6 +10,8 @@ on:
         description: 'OpenVPN version to build, e.g. v2.7.8 (needs openvpn-<version>-aws.patch)'
         required: true
         type: string
+permissions:
+  contents: read
 jobs:
   build:
     # https://github.com/OpenVPN/openvpn/blob/master/.github/workflows/build.yaml#L132
@@ -66,25 +68,59 @@ jobs:
         run: go build -o SAMLserver server.go
         working-directory: aws-vpn-client
 
-      - name: release
-        run: >
-          mkdir release &&
-          cp
-          aws-vpn-client/SAMLserver
-          aws-vpn-client/vpn.conf
-          aws-vpn-client/domains.txt
-          aws-vpn-client/aws-connect.sh
-          aws-vpn-client/resolvconf.sh
-          openvpn/src/openvpn/openvpn
-          release &&
-          chmod +x
-          release/SAMLserver
-          release/aws-connect.sh
-          release/openvpn
-          release/resolvconf.sh
+      # A tarball keeps the executable bits, which a zipped artifact drops.
+      - name: package
+        run: |
+          name="aws-vpn-client-${OPENVPN_VERSION}-linux-x86_64"
+          mkdir "$name"
+          cp aws-vpn-client/{SAMLserver,vpn.conf,domains.txt,aws-connect.sh,resolvconf.sh} \
+            openvpn/src/openvpn/openvpn "$name"
+          chmod +x "$name"/{SAMLserver,aws-connect.sh,resolvconf.sh,openvpn}
+          tar czf "$name.tar.gz" "$name"
+          sha256sum "$name.tar.gz" > "$name.tar.gz.sha256"
+          version_line="$(openvpn/src/openvpn/openvpn --version | head -n1)"
+          [[ -n "$version_line" ]] || { echo "openvpn --version printed nothing" >&2; exit 1; }
+          {
+            echo "$version_line"
+            echo
+            echo "Patched with \`openvpn-${OPENVPN_VERSION}-aws.patch\`. Built on \`ubuntu-latest\`, so it needs a compatible glibc and the shared libraries lzo2, lz4, libnl-genl-3, libcap-ng and OpenSSL; build from source on other distributions."
+            echo
+            echo "Verify the download with \`sha256sum -c $name.tar.gz.sha256\`."
+          } > release-notes.md
 
       - name: upload artifacts
         uses: actions/upload-artifact@v7
         with:
           name: aws-vpn-client
-          path: release
+          path: |
+            aws-vpn-client-*.tar.gz
+            aws-vpn-client-*.tar.gz.sha256
+            release-notes.md
+          if-no-files-found: error
+
+  # Tag pushes publish the build as a GitHub release; manual runs only keep the artifact.
+  release:
+    if: github.ref_type == 'tag'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: download artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: aws-vpn-client
+
+      - name: publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            gh release upload "$TAG" --clobber aws-vpn-client-*.tar.gz aws-vpn-client-*.tar.gz.sha256
+          else
+            gh release create "$TAG" --verify-tag --title "OpenVPN ${TAG#openvpn-} with AWS patch" \
+              --notes-file release-notes.md --generate-notes \
+              aws-vpn-client-*.tar.gz aws-vpn-client-*.tar.gz.sha256
+          fi
