@@ -22,8 +22,8 @@ Older versions are at the matching `openvpn-vX.Y.Z` tags.
 
 ## How to use
 
-1. Get the binaries: download the `aws-vpn-client` artifact of a tagged build, or apply the patch to the matching OpenVPN release, build it and run `go build -o SAMLserver server.go`
-1. Put `openvpn`, `SAMLserver`, `aws-connect.sh`, `resolvconf.sh`, `vpn.conf`, `domains.txt` and your CA file in one directory; the scripts use relative paths
+1. Get the binaries: download `aws-vpn-client-vX.Y.Z-linux-x86_64.tar.gz` from the [releases](https://github.com/gloutsch/aws-vpn-client/releases) and verify it with the `.sha256` file. It is built on Ubuntu; on other distributions apply the patch to the matching OpenVPN release, build it and run `go build -o SAMLserver server.go`
+1. Keep `openvpn`, `SAMLserver`, `aws-connect.sh`, `resolvconf.sh`, `vpn.conf`, `domains.txt` and your CA file in one directory; the scripts use relative paths
 1. Run `./aws-connect.sh --host <vpn-host> --ca <ca.pem>`. Optional: `--port` (default 1194), `--timeout` (seconds to wait for the SAML response, default 300), `--config`, `--bin`
 
 Requires `sudo`, a browser opener (`xdg-open`), and `resolvconf` and `resolvectl` for the DNS hook.
@@ -40,9 +40,11 @@ Inspect your ovpn config and remove the following lines if present
 
 A release is a tag `openvpn-vX.Y.Z` on a commit that contains
 `openvpn-vX.Y.Z-aws.patch`. Pushing the tag runs the build, which applies the
-patch to OpenVPN vX.Y.Z and uploads OpenVPN and `SAMLserver` with the scripts as
-the `aws-vpn-client` artifact. The build can also be started by hand with
-`gh workflow run build.yaml -f openvpn_version=vX.Y.Z`.
+patch to OpenVPN vX.Y.Z, builds OpenVPN and `SAMLserver`, and publishes a GitHub
+release with `aws-vpn-client-vX.Y.Z-linux-x86_64.tar.gz` and its `.sha256`. The
+build can also be started by hand with
+`gh workflow run build.yaml -f openvpn_version=vX.Y.Z`; a manual run only keeps
+the tarball as a workflow artifact and publishes no release.
 
 `./latest-openvpn-version.sh [series]` prints the latest stable OpenVPN release
 (for example `2.6` for that series) and tells whether its patch exists.
