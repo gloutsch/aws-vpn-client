@@ -1,6 +1,6 @@
 diff -ruN -x '*.orig' a/src/openvpn/buffer.h b/src/openvpn/buffer.h
---- a/src/openvpn/buffer.h	2026-10-22 11:55:17.381806542 +0200
-+++ b/src/openvpn/buffer.h	2026-10-22 11:55:17.397953630 +0200
+--- a/src/openvpn/buffer.h	2026-11-05 14:07:25.000000000 +0100
++++ b/src/openvpn/buffer.h	2026-11-23 10:23:56.941090910 +0100
 @@ -26,7 +26,7 @@
  #include "basic.h"
  #include "error.h"
@@ -11,8 +11,8 @@ diff -ruN -x '*.orig' a/src/openvpn/buffer.h b/src/openvpn/buffer.h
  /*
   * Define verify_align function, otherwise
 diff -ruN -x '*.orig' a/src/openvpn/common.h b/src/openvpn/common.h
---- a/src/openvpn/common.h	2026-10-22 11:55:17.381884498 +0200
-+++ b/src/openvpn/common.h	2026-10-22 11:55:17.397987975 +0200
+--- a/src/openvpn/common.h	2026-11-05 14:07:25.000000000 +0100
++++ b/src/openvpn/common.h	2026-11-23 10:23:56.941226351 +0100
 @@ -67,7 +67,7 @@
   * maximum size of a single TLS message (cleartext).
   * This parameter must be >= PUSH_BUNDLE_SIZE
@@ -23,8 +23,8 @@ diff -ruN -x '*.orig' a/src/openvpn/common.h b/src/openvpn/common.h
  /* TLS control buffer minimum size
   *
 diff -ruN -x '*.orig' a/src/openvpn/error.h b/src/openvpn/error.h
---- a/src/openvpn/error.h	2026-10-22 11:55:17.383272625 +0200
-+++ b/src/openvpn/error.h	2026-10-22 11:55:17.398011381 +0200
+--- a/src/openvpn/error.h	2026-11-05 14:07:25.000000000 +0100
++++ b/src/openvpn/error.h	2026-11-23 10:23:56.941296429 +0100
 @@ -33,7 +33,10 @@
  #if defined(ENABLE_PKCS11) || defined(ENABLE_MANAGEMENT)
  #define ERR_BUF_SIZE 10240
@@ -38,9 +38,9 @@ diff -ruN -x '*.orig' a/src/openvpn/error.h b/src/openvpn/error.h
  
  struct gc_arena;
 diff -ruN -x '*.orig' a/src/openvpn/manage.c b/src/openvpn/manage.c
---- a/src/openvpn/manage.c	2026-10-22 11:55:17.384081573 +0200
-+++ b/src/openvpn/manage.c	2026-10-22 11:55:17.398040738 +0200
-@@ -2426,7 +2426,7 @@
+--- a/src/openvpn/manage.c	2026-11-05 14:07:25.000000000 +0100
++++ b/src/openvpn/manage.c	2026-11-23 10:23:56.941503021 +0100
+@@ -2427,7 +2427,7 @@
      /*
       * read command line from socket
       */
@@ -49,7 +49,7 @@ diff -ruN -x '*.orig' a/src/openvpn/manage.c b/src/openvpn/manage.c
      ssize_t len = 0;
  
  #ifdef TARGET_ANDROID
-@@ -2747,7 +2747,7 @@
+@@ -2748,7 +2748,7 @@
           * Allocate helper objects for command line input and
           * command output from/to the socket.
           */
@@ -59,8 +59,8 @@ diff -ruN -x '*.orig' a/src/openvpn/manage.c b/src/openvpn/manage.c
  
          /*
 diff -ruN -x '*.orig' a/src/openvpn/manage.h b/src/openvpn/manage.h
---- a/src/openvpn/manage.h	2026-10-22 11:55:17.384153430 +0200
-+++ b/src/openvpn/manage.h	2026-10-22 11:55:17.398119039 +0200
+--- a/src/openvpn/manage.h	2026-11-05 14:07:25.000000000 +0100
++++ b/src/openvpn/manage.h	2026-11-23 10:23:56.941762232 +0100
 @@ -56,6 +56,9 @@
  #define MANAGEMENT_ECHO_BUFFER_SIZE         100
  #define MANAGEMENT_STATE_BUFFER_SIZE        100
@@ -72,8 +72,8 @@ diff -ruN -x '*.orig' a/src/openvpn/manage.h b/src/openvpn/manage.h
   * Management-interface-based deferred authentication
   */
 diff -ruN -x '*.orig' a/src/openvpn/misc.h b/src/openvpn/misc.h
---- a/src/openvpn/misc.h	2026-10-22 11:55:17.384312401 +0200
-+++ b/src/openvpn/misc.h	2026-10-22 11:55:17.398147845 +0200
+--- a/src/openvpn/misc.h	2026-11-05 14:07:25.000000000 +0100
++++ b/src/openvpn/misc.h	2026-11-23 10:23:56.941828831 +0100
 @@ -64,7 +64,10 @@
  #ifdef ENABLE_PKCS11
  #define USER_PASS_LEN 4096
@@ -87,8 +87,8 @@ diff -ruN -x '*.orig' a/src/openvpn/misc.h b/src/openvpn/misc.h
      /* Note that username and password are expected to be null-terminated */
      char username[USER_PASS_LEN];
 diff -ruN -x '*.orig' a/src/openvpn/options.h b/src/openvpn/options.h
---- a/src/openvpn/options.h	2026-10-22 11:55:17.385345141 +0200
-+++ b/src/openvpn/options.h	2026-10-22 11:55:17.398182109 +0200
+--- a/src/openvpn/options.h	2026-11-05 14:07:25.000000000 +0100
++++ b/src/openvpn/options.h	2026-11-23 10:23:56.941894082 +0100
 @@ -53,8 +53,8 @@
  /*
   * Max size of options line and parameter.
@@ -101,8 +101,8 @@ diff -ruN -x '*.orig' a/src/openvpn/options.h b/src/openvpn/options.h
  #define PING_TIMEOUT_MAX 86400 /* one day (in seconds) */
  
 diff -ruN -x '*.orig' a/src/openvpn/ssl.c b/src/openvpn/ssl.c
---- a/src/openvpn/ssl.c	2026-10-22 11:55:17.387041927 +0200
-+++ b/src/openvpn/ssl.c	2026-10-22 11:55:17.398222912 +0200
+--- a/src/openvpn/ssl.c	2026-11-05 14:07:25.000000000 +0100
++++ b/src/openvpn/ssl.c	2026-11-23 10:23:56.942126807 +0100
 @@ -1836,7 +1836,7 @@
  static bool
  write_empty_string(struct buffer *buf)

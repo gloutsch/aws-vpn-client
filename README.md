@@ -10,7 +10,7 @@ for the implementation details. The DNS hook needs Linux with systemd-resolved.
 ## Content of the repository
 
 - `openvpn-vX.Y.Z-aws.patch` - patch required to build an AWS compatible
-OpenVPN vX.Y.Z. Current: [openvpn-v2.7.8-aws.patch](openvpn-v2.7.8-aws.patch).
+OpenVPN vX.Y.Z. Current: [openvpn-v2.7.9-aws.patch](openvpn-v2.7.9-aws.patch).
 Older versions are at the matching `openvpn-vX.Y.Z` tags.
 [PATCH_UPGRADE_NOTES.md](PATCH_UPGRADE_NOTES.md) describes how to port it to a new OpenVPN version.
 - [server.go](server.go) - Go server listening on http://127.0.0.1:35001 that saves the SAML POST data to `saml-response.txt`
